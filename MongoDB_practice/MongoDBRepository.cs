@@ -30,8 +30,7 @@ namespace MongoDB_practice
       var filter = builder.Eq(eq => eq.id, item.id);
       var update = Builders<T>.Update.Set(s => s.name, item.name);
 
-      collection.UpdateOne(filter,update);
-      //collection.UpdateOne(filter, item);
+      //collection.UpdateOne(filter,update);
       collection.FindOneAndUpdate<T>(filter, update);
 
     }
