@@ -1,4 +1,5 @@
-﻿using MongoDB.Driver;
+﻿using MongoDB.Bson;
+using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -36,22 +37,37 @@ namespace MongoDB_practice
     }
   }
 
-  internal class MongoDBRepository
-  {
-    private MongoClient client;
-    private IMongoDatabase database;
-    private IMongoCollection<Equipment> collection;
-
-    public MongoDBRepository(string connectionString)
+    internal class MongoDBRepository
     {
-      client = new MongoClient(connectionString);
-      database = client.GetDatabase("local");
-      collection = database.GetCollection<Equipment>("Equipment");
+        private MongoClient client;
+        private IMongoDatabase database;
+        private IMongoCollection<Equipment> collection;
 
-    }
-    public void Add(Equipment item)
-    {
-      collection.InsertOne(item);
-    }
+        public MongoDBRepository(string connectionString) {
+            client = new MongoClient(connectionString);
+            database = client.GetDatabase("local");
+            collection = database.GetCollection<Equipment>("Equipment");
+
+        }
+        public void Add(Equipment item) {
+            collection.InsertOne(item);
+        }
+
+        public void AddMany(List<Equipment> equipments) {
+            collection.InsertMany(equipments);
+        }
+
+        public long CountDocuments() {
+            return collection.Count<Equipment>(eq=>eq.id > 1);
+        }
+
+        public Equipment GetById(int id) {
+            return collection.Find(eq => eq.id == id).FirstOrDefault();
+        }
+
+        public IEnumerable<Equipment> GetAll() {
+            // give empty filter, then return all documents
+            return collection.Find(Builders<Equipment>.Filter.Empty).ToEnumerable();
+        }
   }
 }
